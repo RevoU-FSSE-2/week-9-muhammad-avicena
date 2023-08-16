@@ -7,7 +7,7 @@ import compression from "compression";
 import cors from "cors";
 import * as dotenv from "dotenv";
 
-import { getConnectionFromPool } from "./dbconn";
+import { getConnectionDb } from "./dbconn";
 import usersRouter from "./routes/userRoutes";
 import indexRouter from "./routes/indexRoutes";
 import authRoutes from "./routes/authRoutes";
@@ -39,13 +39,13 @@ server.listen(port, () => {
 
 // Connect to MySQL Database Server
 async function checkConnection() {
-    try {
-        const connection = await getConnectionFromPool();
-        console.log("Database connection successful");
-        connection.end();
-    } catch (err) {
-        console.error("An error occurred:", err);
-    }
+  try {
+    const connection = await getConnectionDb();
+    console.log("Database connection successful");
+    connection.release();
+  } catch (err) {
+    console.error("An error occurred:", err);
+  }
 }
 checkConnection();
 
