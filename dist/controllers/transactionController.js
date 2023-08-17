@@ -25,7 +25,10 @@ exports.listTransaction = listTransaction;
 const createTransaction = async (req, res) => {
     const { user_id, type, amount } = req.body;
     const connection = await (0, dbConnectionPool_1.getConnectionDb)();
+    const cacheKey = "user:" + user_id;
+    console.log(cacheKey);
     try {
+        await redisConnection_1.redis.del(cacheKey);
         const [result] = await connection.query(`INSERT INTO transactions (user_id, type, amount)
       VALUES (?, ?, ?)
       `, [user_id, type, amount]);
