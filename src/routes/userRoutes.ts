@@ -4,6 +4,6 @@ import { listUser, getUserById } from "../controllers/userController";
 const router = express.Router();
 
 router.get("/", listUser);
-router.get("/:user_id", getUserById);
+router.get("/:id", getUserById);
 
 export default router;

@@ -6,12 +6,14 @@ const dbConnectionPool_1 = require("./dbConnectionPool");
 const getListUsersDb = async () => {
     const connection = await (0, dbConnectionPool_1.getConnectionDb)();
     try {
-        const [rows] = await connection.query(`SELECT * FROM users`);
-        console.log("List user :", rows);
-        return rows;
+        const [result, err] = await connection.query(`SELECT * FROM user`);
+        // console.log("error",err)
+        console.log("result", result);
+        console.log("err", err);
     }
     catch (err) {
-        console.log(err);
+        console.log("Caught error :", err);
+        return err;
     }
     finally {
         connection.release();

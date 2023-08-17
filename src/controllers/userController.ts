@@ -1,19 +1,26 @@
 import { Request, Response, NextFunction } from "express";
-import {
-  getListUsersDb,
-  getUsersByIdDb,
-} from "../db/userPool";
+import { getConnectionDb } from "../db/dbConnectionPool";
 
 export const listUser = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const dataUser = await getListUsersDb();
-  res.status(200).json({
-    message: "List of all users",
-    users: dataUser,
-  });
+  const connection = await getConnectionDb();
+
+  try {
+    const [result]: any = await connection.query(`SELECT * FROM users`);
+    res.status(200).json({
+      message: "List of all users",
+      success: true,
+      data: result,
+    });
+  } catch (err) {
+    console.log("Caught error :", err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  } finally {
+    connection.release();
+  }
 };
 
 export const getUserById = async (
@@ -21,16 +28,33 @@ export const getUserById = async (
   res: Response,
   next: NextFunction
 ) => {
-  const user_id = parseInt(req.params.user_id);
+  const id = parseInt(req.params.id);
+  const connection = await getConnectionDb();
 
   try {
-    const dataUser: any = await getUsersByIdDb(user_id);
-    if (!dataUser) {
-      res.status(404).json({ message: "User not found" });
+    const [result]: any = await connection.query(
+      `SELECT * FROM users WHERE id = ?`,
+      [id]
+    );
+    if (result.length > 0) {
+      console.log("Get user by ID :", result);
+      return res.status(200).json({
+        message: "List users by id",
+        success: true,
+        data: result[0],
+      });
+    } else {
+      console.log("Not found");
+      return res.status(404).json({
+        message: "List users by id",
+        success: false,
+        data: "Not found",
+      });
     }
-    res.status(200).json({ message: "User found", user: dataUser });
-  } catch (error) {
-    console.error("Error :", error);
-    res.status(500).json({ message: "Internal server error" });
+  } catch (err) {
+    console.log("Caught error :", err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  } finally {
+    connection.release();
   }
 };
