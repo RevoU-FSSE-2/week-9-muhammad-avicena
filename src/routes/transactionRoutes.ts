@@ -5,9 +5,9 @@ const router = express.Router();
 
 router.get("/", listTransaction);
 router.post("/", createTransaction);
-router.get("/:transactionId", getTransactionById);
-router.put("/:transactionId", updateTransaction);
-router.delete("/:transactionId", deleteTransaction);
-router.patch("/:transactionId", updatePriceTransaction);
+router.get("/:transaction_id", getTransactionById);
+router.put("/:transaction_id", updateTransaction);
+router.delete("/:transaction_id", deleteTransaction);
+router.patch("/price/:transaction_id", updatePriceTransaction);
 
 export default router;
