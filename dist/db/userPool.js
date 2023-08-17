@@ -22,7 +22,6 @@ const getUsersByIdDb = async (user_id) => {
     const connection = await (0, dbConnectionPool_1.getConnectionDb)();
     try {
         const [result] = await connection.query(`SELECT * FROM users WHERE user_id = ?`, [user_id]);
-        connection.release();
         console.log("Get user by ID :", result);
         return result;
     }
