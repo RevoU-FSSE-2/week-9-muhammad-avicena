@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { getConnectionDb } from "../db/dbConnectionPool";
+import Redis from "ioredis";
+
+const redis = new Redis();
 
 export const listUser = async (
   req: Request,
@@ -30,8 +33,18 @@ export const getUserById = async (
 ) => {
   const id = parseInt(req.params.id);
   const connection = await getConnectionDb();
-
+  const cacheKey = "user:" + id;
+  console.log(cacheKey);
   try {
+    const cachedData = await redis.hgetall(cacheKey);
+    if (cachedData && Object.keys(cachedData).length !== 0) {
+      console.log("Cached id user:", id);
+      return res.status(200).json({
+        message: "List users by id (cached)",
+        success: true,
+        data: cachedData,
+      });
+    }
     const [result]: any = await connection.query(
       `SELECT
         u.id,
@@ -46,6 +59,19 @@ export const getUserById = async (
       [id]
     );
     if (result.length > 0) {
+      const balance = result[0].balance || 0;
+      const expense = result[0].expense || 0;
+
+      await redis.hmset(cacheKey, {
+        id: result[0].id,
+        name: result[0].name,
+        address: result[0].address,
+        balance: balance,
+        expense: expense,
+      });
+
+      await redis.expire(cacheKey, 600);
+
       console.log("Get user by ID :", result);
       return res.status(200).json({
         message: "List users by id",

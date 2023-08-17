@@ -1,7 +1,12 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getUserById = exports.listUser = void 0;
 const dbConnectionPool_1 = require("../db/dbConnectionPool");
+const ioredis_1 = __importDefault(require("ioredis"));
+const redis = new ioredis_1.default();
 const listUser = async (req, res, next) => {
     const connection = await (0, dbConnectionPool_1.getConnectionDb)();
     try {
@@ -24,7 +29,18 @@ exports.listUser = listUser;
 const getUserById = async (req, res, next) => {
     const id = parseInt(req.params.id);
     const connection = await (0, dbConnectionPool_1.getConnectionDb)();
+    const cacheKey = "user:" + id;
+    console.log(cacheKey);
     try {
+        const cachedData = await redis.hgetall(cacheKey);
+        if (cachedData && Object.keys(cachedData).length !== 0) {
+            console.log("Cached id user:", id);
+            return res.status(200).json({
+                message: "List users by id (cached)",
+                success: true,
+                data: cachedData,
+            });
+        }
         const [result] = await connection.query(`SELECT
         u.id,
         u.name,
@@ -36,6 +52,16 @@ const getUserById = async (req, res, next) => {
       WHERE u.id = ?
       GROUP BY u.id;`, [id]);
         if (result.length > 0) {
+            const balance = result[0].balance || 0;
+            const expense = result[0].expense || 0;
+            await redis.hmset(cacheKey, {
+                id: result[0].id,
+                name: result[0].name,
+                address: result[0].address,
+                balance: balance,
+                expense: expense,
+            });
+            await redis.expire(cacheKey, 600);
             console.log("Get user by ID :", result);
             return res.status(200).json({
                 message: "List users by id",
