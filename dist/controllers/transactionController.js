@@ -1,83 +1,111 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteTransaction = exports.updateTransaction = exports.createTransaction = exports.listTransaction = void 0;
-const transactionPool_1 = require("../db/transactionPool");
+const dbConnectionPool_1 = require("../db/dbConnectionPool");
 const listTransaction = async (req, res) => {
-    const transactionData = await (0, transactionPool_1.getListTransactionsDb)();
+    const connection = await (0, dbConnectionPool_1.getConnectionDb)();
     try {
-        const response = {
+        const [result] = await connection.query(`SELECT * FROM transactions`);
+        res.status(200).json({
             message: "List of all transactions",
-            transaction: transactionData,
-        };
-        res.status(200).json(response);
+            success: true,
+            data: result,
+        });
     }
     catch (err) {
-        console.error(err);
-        res.status(500).json({ message: err });
+        console.log("Caught error :", err);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+    finally {
+        connection.release();
     }
 };
 exports.listTransaction = listTransaction;
 const createTransaction = async (req, res) => {
-    const { type_id, user_id, transaction_name, transaction_amount } = req.body;
+    const { user_id, type, amount } = req.body;
+    const connection = await (0, dbConnectionPool_1.getConnectionDb)();
     try {
-        const result = await (0, transactionPool_1.createTransactionDb)(type_id, user_id, transaction_name, transaction_amount);
-        console.log(result);
-        console.log(result.insertId);
-        res.status(200).json({
+        const [result] = await connection.query(`INSERT INTO transactions (user_id, type, amount)
+      VALUES (?, ?, ?)
+      `, [user_id, type, amount]);
+        console.log("Create transaction :", result);
+        return res.status(200).json({
             message: "Successfully created a transaction",
-            transaction: {
-                transaction_id: result.insertId,
-                type_id,
-                user_id,
-                transaction_name,
-                transaction_amount,
-            },
+            success: true,
+            data: { id: result.insertId, user_id, type, amount },
         });
     }
     catch (err) {
-        console.log(err);
+        console.log("Caught error :", err);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+    finally {
+        connection.release();
     }
 };
 exports.createTransaction = createTransaction;
 const updateTransaction = async (req, res) => {
-    const transaction_id = parseInt(req.params.transaction_id);
-    const { user_id, type_id, transaction_name, transaction_amount } = req.body;
+    const id = parseInt(req.params.id);
+    const { user_id, type, amount } = req.body;
+    const connection = await (0, dbConnectionPool_1.getConnectionDb)();
     try {
-        const transactionData = await (0, transactionPool_1.updateTransactionByIdDb)(user_id, type_id, transaction_name, transaction_amount, transaction_id);
-        if (transactionData.affectedRows == 0 ||
-            transactionData.affectedRows == undefined) {
-            return res.status(400).json({ message: "Invalid input data" });
+        const [result] = await connection.query(` UPDATE transactions SET user_id = ?, type = ?, amount = ?
+        WHERE id = ?
+      `, [user_id, type, amount, id]);
+        console.log("Update transaction :", result);
+        if (result.affectedRows > 0) {
+            return res.status(200).json({
+                message: "Successfully updated a transaction",
+                success: true,
+                data: { id, user_id, type, amount },
+            });
         }
         else {
-            res.status(200).json({
-                message: "Successfully updated a transaction",
-                user: { user_id, type_id, transaction_name, transaction_amount },
+            return res.status(404).json({
+                message: "Failed updated a transaction",
+                success: false,
+                data: "Not found",
             });
         }
     }
     catch (err) {
-        console.log(err);
+        console.log("Caught error :", err);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+    finally {
+        connection.release();
     }
 };
 exports.updateTransaction = updateTransaction;
 const deleteTransaction = async (req, res) => {
-    const transaction_id = parseInt(req.params.transaction_id);
+    const id = parseInt(req.params.id);
+    const connection = await (0, dbConnectionPool_1.getConnectionDb)();
     try {
-        const transactionData = await (0, transactionPool_1.deleteTransactionByIdDb)(transaction_id);
-        if (transactionData.affectedRows == 0 ||
-            transactionData.affectedRows == undefined) {
-            return res.status(400).json({ message: "Invalid data input" });
+        const [result] = await connection.query(` DELETE FROM transactions 
+        WHERE id = ?
+      `, [id]);
+        console.log("Update transaction :", result);
+        if (result.affectedRows > 0) {
+            return res.status(200).json({
+                message: "Successfully deleted a transaction",
+                success: true,
+                data: { id },
+            });
         }
         else {
-            return res.status(200).json({
-                message: "Successfully deleted",
-                transaction_id: transaction_id,
+            return res.status(404).json({
+                message: "Failed deleted a transaction",
+                success: false,
+                data: "Not found",
             });
         }
     }
     catch (err) {
-        console.log(err);
-        return res.status(500).json({ message: "Internal Server Error" });
+        console.log("Caught error :", err);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+    finally {
+        connection.release();
     }
 };
 exports.deleteTransaction = deleteTransaction;

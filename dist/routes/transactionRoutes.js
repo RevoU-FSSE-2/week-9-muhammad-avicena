@@ -8,6 +8,6 @@ const transactionController_1 = require("../controllers/transactionController");
 const router = express_1.default.Router();
 router.get("/", transactionController_1.listTransaction);
 router.post("/", transactionController_1.createTransaction);
-router.put("/:transaction_id", transactionController_1.updateTransaction);
-router.delete("/:transaction_id", transactionController_1.deleteTransaction);
+router.put("/:id", transactionController_1.updateTransaction);
+router.delete("/:id", transactionController_1.deleteTransaction);
 exports.default = router;

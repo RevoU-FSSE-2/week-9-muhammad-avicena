@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.get("/", listTransaction);
 router.post("/", createTransaction);
-router.put("/:transaction_id", updateTransaction);
-router.delete("/:transaction_id", deleteTransaction);
+router.put("/:id", updateTransaction);
+router.delete("/:id", deleteTransaction);
 
 export default router;
