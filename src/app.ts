@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import compression from "compression";
 import cors from "cors";
 import * as dotenv from "dotenv";
+import { redis } from "./db/redisConnection";
 
 import { getConnectionDb } from "./db/dbConnectionPool";
 import usersRouter from "./routes/userRoutes";
@@ -36,7 +37,7 @@ server.listen(port, () => {
 });
 
 // Connect to MySQL Database Server
-async function checkConnection() {
+async function checkConnectionMySQL() {
   try {
     const connection = await getConnectionDb();
     console.log("Database connection successful");
@@ -45,7 +46,18 @@ async function checkConnection() {
     console.error("An error occurred:", err);
   }
 }
-checkConnection();
+checkConnectionMySQL();
+
+// Connect to Redis Database Server
+async function checkConnectionRedis(){
+  try {
+    await redis.ping();
+    console.log("Redis connection successful");
+  } catch (err) {
+    console.log("An error occurred:", err);
+  }
+}
+checkConnectionRedis();
 
 // Error handlers
 app.use(function (req: Request, res: Response, next: NextFunction) {
