@@ -25,7 +25,16 @@ const getUserById = async (req, res, next) => {
     const id = parseInt(req.params.id);
     const connection = await (0, dbConnectionPool_1.getConnectionDb)();
     try {
-        const [result] = await connection.query(`SELECT * FROM users WHERE id = ?`, [id]);
+        const [result] = await connection.query(`SELECT
+        u.id,
+        u.name,
+        u.address,
+        SUM(CASE WHEN t.type = 'income' THEN t.amount ELSE 0 END) AS balance,
+        SUM(CASE WHEN t.type = 'expense' THEN t.amount ELSE 0 END) AS expense
+      FROM users u
+      LEFT JOIN transactions t ON u.id = t.user_id
+      WHERE u.id = ?
+      GROUP BY u.id;`, [id]);
         if (result.length > 0) {
             console.log("Get user by ID :", result);
             return res.status(200).json({

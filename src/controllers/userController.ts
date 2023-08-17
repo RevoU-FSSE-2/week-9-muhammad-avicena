@@ -33,7 +33,16 @@ export const getUserById = async (
 
   try {
     const [result]: any = await connection.query(
-      `SELECT * FROM users WHERE id = ?`,
+      `SELECT
+        u.id,
+        u.name,
+        u.address,
+        SUM(CASE WHEN t.type = 'income' THEN t.amount ELSE 0 END) AS balance,
+        SUM(CASE WHEN t.type = 'expense' THEN t.amount ELSE 0 END) AS expense
+      FROM users u
+      LEFT JOIN transactions t ON u.id = t.user_id
+      WHERE u.id = ?
+      GROUP BY u.id;`,
       [id]
     );
     if (result.length > 0) {
