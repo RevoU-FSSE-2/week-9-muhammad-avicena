@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { getConnectionDb } from "../db/dbConnectionPool";
-import Redis from "ioredis";
-
-const redis = new Redis();
+import { redis } from "../db/redisConnection";
 
 export const listUser = async (
   req: Request,

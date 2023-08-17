@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { getConnectionDb } from "../db/dbConnectionPool";
+import { redis } from "../db/redisConnection";
+
 
 export const listTransaction = async (req: Request, res: Response) => {
   const connection = await getConnectionDb();
@@ -47,8 +49,9 @@ export const createTransaction = async (req: Request, res: Response) => {
 export const updateTransaction = async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
   const { user_id, type, amount } = req.body;
-
   const connection = await getConnectionDb();
+  const cacheKey = "user:" + user_id;
+  console.log(cacheKey);
 
   try {
     const [result]: any = await connection.query(
@@ -59,6 +62,7 @@ export const updateTransaction = async (req: Request, res: Response) => {
     );
     console.log("Update transaction :", result);
     if (result.affectedRows > 0) {
+      await redis.del(cacheKey);
       return res.status(200).json({
         message: "Successfully updated a transaction",
         success: true,

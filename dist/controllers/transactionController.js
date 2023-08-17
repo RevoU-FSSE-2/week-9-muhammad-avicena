@@ -1,12 +1,8 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteTransaction = exports.updateTransaction = exports.createTransaction = exports.listTransaction = void 0;
 const dbConnectionPool_1 = require("../db/dbConnectionPool");
-const ioredis_1 = __importDefault(require("ioredis"));
-const redis = new ioredis_1.default();
+const redisConnection_1 = require("../db/redisConnection");
 const listTransaction = async (req, res) => {
     const connection = await (0, dbConnectionPool_1.getConnectionDb)();
     try {
@@ -61,7 +57,7 @@ const updateTransaction = async (req, res) => {
       `, [user_id, type, amount, id]);
         console.log("Update transaction :", result);
         if (result.affectedRows > 0) {
-            await redis.del(cacheKey);
+            await redisConnection_1.redis.del(cacheKey);
             return res.status(200).json({
                 message: "Successfully updated a transaction",
                 success: true,
