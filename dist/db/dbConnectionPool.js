@@ -15,7 +15,7 @@ exports.pool = promise_1.default.createPool({
 });
 exports.pool2 = promise_1.default.createPool(`${process.env.DB_RAILWAY_URL}`);
 const getConnectionDb = async () => {
-    const connection = await exports.pool.getConnection();
+    const connection = await exports.pool2.getConnection();
     return connection;
 };
 exports.getConnectionDb = getConnectionDb;

@@ -13,6 +13,6 @@ export const pool = mysql.createPool({
 export const pool2 = mysql.createPool(`${process.env.DB_RAILWAY_URL}`);
 
 export const getConnectionDb = async () => {
-  const connection = await pool.getConnection();
+  const connection = await pool2.getConnection();
   return connection;
 };
