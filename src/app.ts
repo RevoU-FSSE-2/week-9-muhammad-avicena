@@ -7,7 +7,7 @@ import compression from "compression";
 import cors from "cors";
 import * as dotenv from "dotenv";
 
-import { getConnectionDb } from "./dbconn";
+import { getConnectionDb } from "./db/dbConnectionPool";
 import usersRouter from "./routes/userRoutes";
 import indexRouter from "./routes/indexRoutes";
 import authRoutes from "./routes/authRoutes";
