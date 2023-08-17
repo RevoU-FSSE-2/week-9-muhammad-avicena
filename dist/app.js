@@ -34,6 +34,7 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const compression_1 = __importDefault(require("compression"));
 const cors_1 = __importDefault(require("cors"));
 const dotenv = __importStar(require("dotenv"));
+const redisConnection_1 = require("./db/redisConnection");
 const dbConnectionPool_1 = require("./db/dbConnectionPool");
 const userRoutes_1 = __importDefault(require("./routes/userRoutes"));
 const indexRoutes_1 = __importDefault(require("./routes/indexRoutes"));
@@ -57,7 +58,7 @@ server.listen(port, () => {
     console.log("Running on http://localhost:" + port);
 });
 // Connect to MySQL Database Server
-async function checkConnection() {
+async function checkConnectionMySQL() {
     try {
         const connection = await (0, dbConnectionPool_1.getConnectionDb)();
         console.log("Database connection successful");
@@ -67,7 +68,18 @@ async function checkConnection() {
         console.error("An error occurred:", err);
     }
 }
-checkConnection();
+checkConnectionMySQL();
+// Connect to Redis Database Server
+async function checkConnectionRedis() {
+    try {
+        await redisConnection_1.redis.ping();
+        console.log("Redis connection successful");
+    }
+    catch (err) {
+        console.log("An error occurred:", err);
+    }
+}
+checkConnectionRedis();
 // Error handlers
 app.use(function (req, res, next) {
     next((0, http_errors_1.default)(404));
