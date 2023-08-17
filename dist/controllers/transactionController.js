@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteTransaction = exports.updateTransaction = exports.createTransaction = exports.getTransactionById = exports.listTransaction = void 0;
+exports.deleteTransaction = exports.updateTransaction = exports.createTransaction = exports.listTransaction = void 0;
 const transactionPool_1 = require("../db/transactionPool");
 const listTransaction = async (req, res) => {
     const transactionData = await (0, transactionPool_1.getListTransactionsDb)();
@@ -17,26 +17,6 @@ const listTransaction = async (req, res) => {
     }
 };
 exports.listTransaction = listTransaction;
-const getTransactionById = async (req, res) => {
-    const transaction_id = parseInt(req.params.transaction_id);
-    try {
-        const transacionData = await (0, transactionPool_1.getListTransactionByIdDb)(transaction_id);
-        console.log("result", transacionData);
-        if (transacionData.length == 0) {
-            return res.status(404).json({ message: "Transaction not found" });
-        }
-        else {
-            return res
-                .status(200)
-                .json({ message: "List transaction", transaction: transacionData });
-        }
-    }
-    catch (err) {
-        console.log(err);
-        return res.status(500).json({ message: "Internal Server error" });
-    }
-};
-exports.getTransactionById = getTransactionById;
 const createTransaction = async (req, res) => {
     const { type_id, user_id, transaction_name, transaction_amount } = req.body;
     try {

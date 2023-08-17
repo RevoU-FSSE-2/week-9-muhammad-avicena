@@ -8,7 +8,4 @@ const userController_1 = require("../controllers/userController");
 const router = express_1.default.Router();
 router.get("/", userController_1.listUser);
 router.get("/:user_id", userController_1.getUserById);
-router.put("/:user_id", userController_1.updateUserById);
-router.patch("/balance/:user_id", userController_1.updateBalanceUser);
-router.patch("/username/:user_id", userController_1.updateUsernameUser);
 exports.default = router;

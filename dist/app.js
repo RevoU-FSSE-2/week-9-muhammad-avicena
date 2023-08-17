@@ -37,7 +37,6 @@ const dotenv = __importStar(require("dotenv"));
 const dbConnectionPool_1 = require("./db/dbConnectionPool");
 const userRoutes_1 = __importDefault(require("./routes/userRoutes"));
 const indexRoutes_1 = __importDefault(require("./routes/indexRoutes"));
-const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
 const transactionRoutes_1 = __importDefault(require("./routes/transactionRoutes"));
 const app = (0, express_1.default)();
 dotenv.config();
@@ -50,7 +49,6 @@ app.use(body_parser_1.default.json());
 // Routes
 app.use("/", indexRoutes_1.default);
 app.use("/api/user", userRoutes_1.default);
-app.use("/api/auth", authRoutes_1.default);
 app.use("/api/transaction", transactionRoutes_1.default);
 // App listeners
 const server = http_1.default.createServer(app);

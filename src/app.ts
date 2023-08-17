@@ -10,7 +10,6 @@ import * as dotenv from "dotenv";
 import { getConnectionDb } from "./db/dbConnectionPool";
 import usersRouter from "./routes/userRoutes";
 import indexRouter from "./routes/indexRoutes";
-import authRoutes from "./routes/authRoutes";
 import transactionRoutes from "./routes/transactionRoutes";
 
 const app = express();
@@ -27,7 +26,6 @@ app.use(bodyParser.json());
 // Routes
 app.use("/", indexRouter);
 app.use("/api/user", usersRouter);
-app.use("/api/auth", authRoutes);
 app.use("/api/transaction", transactionRoutes);
 
 // App listeners

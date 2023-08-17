@@ -10,6 +10,8 @@ export const pool = mysql.createPool({
   password: process.env.DB_PASSWORD,
 });
 
+export const pool2 = mysql.createPool(`${process.env.DB_RAILWAY_URL}`);
+
 export const getConnectionDb = async () => {
   const connection = await pool.getConnection();
   return connection;

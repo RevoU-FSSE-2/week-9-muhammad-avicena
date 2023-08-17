@@ -4,7 +4,6 @@ import {
   createTransactionDb,
   updateTransactionByIdDb,
   deleteTransactionByIdDb,
-  getListTransactionByIdDb,
 } from "../db/transactionPool";
 
 export const listTransaction = async (req: Request, res: Response) => {
@@ -18,25 +17,6 @@ export const listTransaction = async (req: Request, res: Response) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: err });
-  }
-};
-
-export const getTransactionById = async (req: Request, res: Response) => {
-  const transaction_id = parseInt(req.params.transaction_id);
-
-  try {
-    const transacionData: any = await getListTransactionByIdDb(transaction_id);
-    console.log("result", transacionData);
-    if (transacionData.length == 0) {
-      return res.status(404).json({ message: "Transaction not found" });
-    } else {
-      return res
-        .status(200)
-        .json({ message: "List transaction", transaction: transacionData });
-    }
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({ message: "Internal Server error" });
   }
 };
 
