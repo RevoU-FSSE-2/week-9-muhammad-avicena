@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteTransaction = exports.updateTransaction = exports.createTransaction = exports.listTransaction = void 0;
 const dbConnectionPool_1 = require("../db/dbConnectionPool");
+const redisConnection_1 = require("../db/redisConnection");
 const listTransaction = async (req, res) => {
     const connection = await (0, dbConnectionPool_1.getConnectionDb)();
     try {
@@ -48,12 +49,15 @@ const updateTransaction = async (req, res) => {
     const id = parseInt(req.params.id);
     const { user_id, type, amount } = req.body;
     const connection = await (0, dbConnectionPool_1.getConnectionDb)();
+    const cacheKey = "user:" + user_id;
+    console.log(cacheKey);
     try {
         const [result] = await connection.query(` UPDATE transactions SET user_id = ?, type = ?, amount = ?
         WHERE id = ?
       `, [user_id, type, amount, id]);
         console.log("Update transaction :", result);
         if (result.affectedRows > 0) {
+            await redisConnection_1.redis.del(cacheKey);
             return res.status(200).json({
                 message: "Successfully updated a transaction",
                 success: true,
