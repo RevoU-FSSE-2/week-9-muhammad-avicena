@@ -43,15 +43,18 @@ export const getTransactionById = async (req: Request, res: Response) => {
 export const createTransaction = async (req: Request, res: Response) => {
   const { type_id, user_id, transaction_name, transaction_amount } = req.body;
   try {
-    await createTransactionDb(
+    const result: any = await createTransactionDb(
       type_id,
       user_id,
       transaction_name,
       transaction_amount
     );
+    console.log(result)
+    console.log(result.insertId)
     res.status(200).json({
       message: "Successfully created a transaction",
       transaction: {
+        transaction_id: result.insertId,
         type_id,
         user_id,
         transaction_name,

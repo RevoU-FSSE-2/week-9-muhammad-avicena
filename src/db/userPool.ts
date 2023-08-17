@@ -23,7 +23,6 @@ export const getUsersByIdDb = async (user_id: number) => {
       `SELECT * FROM users WHERE user_id = ?`,
       [user_id]
     );
-    connection.release();
     console.log("Get user by ID :", result);
     return result;
   } catch (err) {
