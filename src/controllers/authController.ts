@@ -1,21 +1,19 @@
-import { Request, Response } from 'express';
-import { userData, UserInterface } from '../db/userData';
+import { Request, Response } from "express";
+import { getListUsersDb } from "../db/userPool";
 
-export const loginController = (req: Request, res: Response) => {
-    const { email, password } = req.body;
-    const user: UserInterface | undefined = userData.find(user => user.email === email);
+export const loginController = async (req: Request, res: Response) => {
+  const dataUser: any = await getListUsersDb();
+  const { user_email, user_password } = req.body;
 
-    if (!user || user.password !== password) {
-        return res.status(401).json({ message: 'Incorrect email or password. Please try again !' });
-    }
-    
-    const response = ({
-        id: user.userId,
-        userName: user.username,
-        userEmail: user.email,
-        balance: user.balance,
-        isAuth: true
-    });
+  const user: any = await dataUser.find(
+    (user: any) => user.user_email === user_email
+  );
 
-    res.status(200).json({ message: 'Login successful', user: response });
+  if (!user || user.user_password !== user_password) {
+    return res
+      .status(401)
+      .json({ message: "Incorrect email or password. Please try again !" });
+  }
+
+  res.status(200).json({ message: "Login successful", user: user });
 };
