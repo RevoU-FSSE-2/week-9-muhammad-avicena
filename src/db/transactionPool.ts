@@ -14,6 +14,23 @@ export const getListTransactionsDb = async () => {
   }
 };
 
+export const getListTransactionByIdDb = async (transaction_id: number) => {
+  const connection = await getConnectionDb();
+
+  try {
+    const [rows]: any = await connection.query(
+      `SELECT * FROM transaction WHERE transaction_id = ?`,
+      [transaction_id]
+    );
+    console.log("Get Transaction by ID:", rows);
+    return rows;
+  } catch (err) {
+    console.log(err);
+  } finally {
+    connection.release();
+  }
+};
+
 export const createTransactionDb = async (
   type_id: number,
   user_id: number,
@@ -37,7 +54,7 @@ export const createTransactionDb = async (
   }
 };
 
-export const updateTransactionaByIdDb = async (
+export const updateTransactionByIdDb = async (
   user_id: number,
   type_id: number,
   transaction_name: string,
@@ -54,6 +71,25 @@ export const updateTransactionaByIdDb = async (
       [user_id, type_id, transaction_name, transaction_amount, transaction_id]
     );
     console.log("Transaction updated:", result);
+    return result;
+  } catch (err) {
+    console.log(err);
+  } finally {
+    connection.release();
+  }
+};
+
+export const deleteTransactionByIdDb = async (transaction_id: number) => {
+  const connection = await getConnectionDb();
+
+  try {
+    const [result] = await connection.query(
+      ` DELETE FROM transaction 
+        WHERE transaction_id = ?
+      `,
+      [transaction_id]
+    );
+    console.log("Transaction deleted:", result);
     return result;
   } catch (err) {
     console.log(err);
