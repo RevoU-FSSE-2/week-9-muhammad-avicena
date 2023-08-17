@@ -34,6 +34,7 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const compression_1 = __importDefault(require("compression"));
 const cors_1 = __importDefault(require("cors"));
 const dotenv = __importStar(require("dotenv"));
+const dbConnectionPool_1 = require("./db/dbConnectionPool");
 const userRoutes_1 = __importDefault(require("./routes/userRoutes"));
 const indexRoutes_1 = __importDefault(require("./routes/indexRoutes"));
 const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
@@ -41,30 +42,42 @@ const transactionRoutes_1 = __importDefault(require("./routes/transactionRoutes"
 const app = (0, express_1.default)();
 dotenv.config();
 app.use((0, cors_1.default)({
-    credentials: true
+    credentials: true,
 }));
 app.use((0, compression_1.default)());
 app.use((0, cookie_parser_1.default)());
 app.use(body_parser_1.default.json());
 // Routes
-app.use('/', indexRoutes_1.default);
-app.use('/api/user', userRoutes_1.default);
-app.use('/api/auth', authRoutes_1.default);
-app.use('/api/transaction', transactionRoutes_1.default);
+app.use("/", indexRoutes_1.default);
+app.use("/api/user", userRoutes_1.default);
+app.use("/api/auth", authRoutes_1.default);
+app.use("/api/transaction", transactionRoutes_1.default);
 // App listeners
 const server = http_1.default.createServer(app);
 const port = process.env.PORT || 8080;
 server.listen(port, () => {
-    console.log('Running on http://localhost:' + port);
+    console.log("Running on http://localhost:" + port);
 });
+// Connect to MySQL Database Server
+async function checkConnection() {
+    try {
+        const connection = await (0, dbConnectionPool_1.getConnectionDb)();
+        console.log("Database connection successful");
+        connection.release();
+    }
+    catch (err) {
+        console.error("An error occurred:", err);
+    }
+}
+checkConnection();
 // Error handlers
 app.use(function (req, res, next) {
     next((0, http_errors_1.default)(404));
 });
 app.use(function (err, req, res, next) {
     res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
+    res.locals.error = req.app.get("env") === "development" ? err : {};
     res.status(err.status || 500);
-    res.send('Error: ' + err.status + " " + err.message);
+    res.send("Error: " + err.status + " " + err.message);
 });
 exports.default = app;

@@ -1,53 +1,84 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateBalanceUser = exports.updateUsernameUser = exports.getUserById = exports.listUser = void 0;
-const userData_1 = require("../db/userData");
-const listUser = (req, res) => {
-    const response = {
-        message: 'List of all users',
-        users: userData_1.userData,
-    };
-    res.status(200).json(response);
+exports.updateBalanceUser = exports.updateUsernameUser = exports.updateUserById = exports.getUserById = exports.listUser = void 0;
+const userPool_1 = require("../db/userPool");
+const listUser = async (req, res, next) => {
+    const dataUser = await (0, userPool_1.getListUsersDb)();
+    res.status(200).json({
+        message: "List of all users",
+        users: dataUser,
+    });
 };
 exports.listUser = listUser;
-const getUserById = (req, res) => {
-    const userId = parseInt(req.params.userId);
-    const user = userData_1.userData.find(user => user.userId === userId);
-    if (!user) {
-        return res.status(404).json({ message: 'User not found' });
+const getUserById = async (req, res, next) => {
+    const user_id = parseInt(req.params.user_id);
+    try {
+        const dataUser = await (0, userPool_1.getUsersByIdDb)(user_id);
+        if (!dataUser) {
+            res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json({ message: "User found", user: dataUser });
     }
-    res.status(200).json({ message: 'User found', user: user });
+    catch (error) {
+        console.error("Error :", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
 };
 exports.getUserById = getUserById;
-const updateUsernameUser = (req, res) => {
-    const userId = parseInt(req.params.userId);
-    const { username } = req.body;
-    const userIndex = userData_1.userData.findIndex(user => user.userId === userId);
-    if (userIndex === -1) {
-        return res.status(404).json({ message: 'User not found' });
+const updateUserById = async (req, res, next) => {
+    const user_id = parseInt(req.params.user_id);
+    const { user_name, user_address, user_email, user_password, user_balance } = req.body;
+    try {
+        const updateUser = await (0, userPool_1.updateUserByIdDb)(user_id, user_name, user_address, user_email, user_password, user_balance);
+        const dataUser = await (0, userPool_1.getUsersByIdDb)(user_id);
+        if (updateUser.affectedRows == 0) {
+            return res.status(400).json({ message: "Invalid input data" });
+        }
+        else {
+            res.status(200).json({ message: "User updated", user: dataUser });
+        }
     }
-    if (username !== undefined) {
-        userData_1.userData[userIndex].username = username;
+    catch (error) {
+        console.log("Error :", error);
+        res.status(500).json({ message: error.message });
     }
-    else {
-        return res.status(400).json({ message: 'Invalid input data' });
+};
+exports.updateUserById = updateUserById;
+const updateUsernameUser = async (req, res, next) => {
+    const user_id = parseInt(req.params.user_id);
+    const { user_name } = req.body;
+    try {
+        const updateUser = await (0, userPool_1.updateUsernameUserDb)(user_id, user_name);
+        const dataUser = await (0, userPool_1.getUsersByIdDb)(user_id);
+        if (updateUser.affectedRows == 0 || updateUser.affectedRows == undefined) {
+            return res.status(400).json({ message: "Invalid input data" });
+        }
+        else {
+            res.status(200).json({ message: "Username updated", user: dataUser });
+        }
     }
-    res.status(200).json({ message: 'User username updated', user: userData_1.userData[userIndex] });
+    catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Internal server error" });
+    }
 };
 exports.updateUsernameUser = updateUsernameUser;
-const updateBalanceUser = (req, res) => {
-    const userId = parseInt(req.params.userId);
-    const { balance } = req.body;
-    const userIndex = userData_1.userData.findIndex(user => user.userId === userId);
-    if (userIndex === -1) {
-        return res.status(404).json({ message: 'User not found' });
+const updateBalanceUser = async (req, res, next) => {
+    const user_id = parseInt(req.params.user_id);
+    const { user_balance } = req.body;
+    try {
+        const updateUser = await (0, userPool_1.updateBalanceUserDb)(user_id, user_balance);
+        const dataUser = await (0, userPool_1.getUsersByIdDb)(user_id);
+        if (updateUser.affectedRows == 0) {
+            return res.status(400).json({ message: "Invalid input data" });
+        }
+        else {
+            res.status(200).json({ message: "Username updated", user: dataUser });
+        }
     }
-    if (balance !== undefined) {
-        userData_1.userData[userIndex].balance = balance;
+    catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Internal server error" });
     }
-    else {
-        return res.status(400).json({ message: 'Invalid input data' });
-    }
-    res.status(200).json({ message: 'User balance updated', user: userData_1.userData[userIndex] });
 };
 exports.updateBalanceUser = updateBalanceUser;
