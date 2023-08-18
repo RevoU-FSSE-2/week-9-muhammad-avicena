@@ -2,7 +2,7 @@
 
 <h1 align="center">Fancy to see you here <img src="https://raw.githubusercontent.com/muhammad-avicena/profile/master/wave.gif" width="30px" height="30px" /> </h1>
 
-hi, I'm Muhammad Avicena. In this repo, I build The Financial Tracker app, it's a web-app tool designed to help users manage and track their financial transactions and expenses.
+hi, I'm Muhammad Avicena. In this repo, I build simple API services TypeScript-based using Node-Express-MySQL with Cache from Redis. 
 
 I am committed to staying up-to-date with industry trends and using the latest tools to develop innovative solutions that surpass expectations.
 Interested to have collaboration ? Find me on:
@@ -13,58 +13,53 @@ Interested to have collaboration ? Find me on:
 [![Gmail Badge](https://img.shields.io/badge/-cenarahmant.dev@gmail.com-c14438?style=flat-square&logo=Gmail&logoColor=white)](mailto:cenarahmant.dev@gmail.com)
 
 ## INGREDIENTS I USE 📜
-- HTML, CSS, JavaScript/Typescript
+- TypeScript
 - Node.js & Express.js
-- External/Internal Source: 
-  - Icon
-  - Image
-  - TailwindCSS
+- MySQL 
+- Redis
+
+### Architecture & ERD :
+
+[![readme_header](./assets-github/arctitect-erd.PNG)](https://avicena.dev/)
+
 ## KEY FEATURES 🌟
 
-- Login (Basic Authentication)
+- List all of users
+- list user by ID
+- List all of transactions
 - Create a transaction
 - Update a transaction
-- View a transaction
 - Delete a transaction
-- Update balance 
-- Update username 
-- Logout
 
-**Available Account** :
-```
-{
-  "email": "admin@dev.com",
-  "password": "admin"
-}
-```
-```
-{
-  "email": "user@dev.com",
-  "password": "user"
-}
-```
+## Redis Usage : 
+- When a request comes in to fetch an API, first check if the requested data is available in the cache. 
+- If the data is found in the cache, return it directly from the cache and avoid hitting the main data source (like a database).
+
+- If the data is not in the cache, fetch it from the main data source (database) and then store it in the cache for future use. Make sure to set an appropriate expiration time on the cached data to ensure it's refreshed periodically.
+
+**Set cache in `List user by ID` :**
+- Implement cache to improve performance and reduce cost of heavy querry operations
+
+**Set TTL(Time-to-Live) in `Update a transaction, Create transactions, & Delete transactions` from ID user :**
+- Implement TTL to maintain real data & efficient resource usage
+
 
 ## AVAILABLE API 📰
 
-**Back-end endpoint:** [https://financial-api.avicena.dev](https://financial-api.avicena.dev) 
+**Back-end endpoint:** [https://week9.avicena.dev](https://week9.avicena.dev) 
  
 | Name  | HTTP Method | Endpoint | Requirements
 | ----------- | ----------- | ----------- | ----------- |
-| **Auth Login** | `POST` | [/api/auth/login](https://financial-api.avicena.dev/api/auth/login) | Request Body: `email: string, password: string`
-| **List All User** | `GET` | [/api/user](https://financial-api.avicena.dev/api/user)
-| **List All Transaction** | `GET` | [/api/transaction](https://financial-api.avicena.dev/api/transaction)
-| **List User by ID** | `GET` | [/api/user/:userId](https://financial-api.avicena.dev/api/user/1) | Request Params: `userId: number`
-| **Create Transaction** | `POST` | [/api/transaction](https://financial-api.avicena.dev/api/transaction) | Request Body: `userId: number, productName: string, productQuantity: number, productPrice: number`
-| **List Transaction by ID** | `GET` | [/api/transaction/:transactionId](https://financial-api.avicena.dev/api/transaction/1) | Request Params: `transactionId: number`
-| **Update Transaction by ID** | `PUT` | [/api/transaction/:transactionId](https://financial-api.avicena.dev/api/transaction/1) | Request Params: `transactionId: number` <br> <br>Request Body: `userId: number, productName: string, productQuantity: number, productPrice: number`
-| **Delete Transaction by ID** | `DELETE` | [/api/transaction/:transactionId](https://financial-api.avicena.dev/api/transaction/1) | Request Params: `transactionId: number`
-| **Update Balance User by ID** | `PATCH` | [/api/user/:userId](https://financial-api.avicena.dev/api/user/1) | Request Params: `userId: number` <br> <br>Request Body: `balance: number`
-| **Update Password User by ID** | `PATCH` | [/api/user/:userId](https://financial-api.avicena.dev/api/user/1) | Request Params: `userId: number` <br><br> Request Body: `password: string`
-| **Update Price Transaction by ID** | `PATCH` | [/api/transaction/:transactionId](https://financial-api.avicena.dev/api/transaction/1) | Request Params: `transactionId: number` <br><br> Request Body: `productPrice: number`
+| **List All User** | `GET` | [/api/user](https://week9.avicena.dev/api/user)
+| **List All Transaction** | `GET` | [/api/transaction](https://week9.avicena.dev/api/transaction)
+| **List User by ID** | `GET` | [/api/user/:id](https://week9.avicena.dev/api/user/1) | Request Params: `id: number`
+| **Create Transaction** | `POST` | [/api/transaction](https://week9.avicena.dev/api/transaction) | Request Body: `user_id: number, type: string, amount: number`
+| **Update Transaction by ID** | `PUT` | [/api/transaction/:transactionId](https://week9.avicena.dev/api/transaction/1) | Request Params: `id: number` <br> <br>Request Body: `user_id: number, type: string, amount: number`
+| **Delete Transaction by ID** | `DELETE` | [/api/transaction/:id](https://week9.avicena.dev/api/transaction/1) | Request Params: `id: number`
 
 
 ## DEPLOYMENT ⚙️
 
-The project has been successfully deployed using Netlify. You can access the production version of the website by following this link: [https://financial-app.avicena.dev](https://financial-app.avicena.dev).
+The project has been successfully deployed using Railway App. You can access the production version of the website by following this link: [https://week9.avicena.dev](https://week9.avicena.dev).
 
 Feel free to explore the website and try out the different features. I appreciate any feedback and suggestions to further improve the user experience.
